@@ -35,6 +35,9 @@ For storing data used in the project (models, data) we are using [Minio](https:/
 
 Finally we are using [Kubeflow pipelines](https://www.kubeflow.org/docs/components/pipelines/) for organizing and scheduling overall execution.  
 
+The overall architecture of implementation is presented below:
+![Overal Architecture](images/RecommenderKubeflow.png)
+
 ## Building
 
 ## Installation
