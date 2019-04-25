@@ -40,7 +40,28 @@ The overall architecture of implementation is presented below:
 
 ## Building
 
+Different pieces are build differently. Python code - recommender ML - is directly build into docker (see above)
+The rest of the code is is leveraging [SBT Docker plugin] and can be build using the following command:
+```` 
+sbt docker
+````
+that produces all images locally. These images have to be pushed into repository accessable from the cluster.
+I was using [Docker Hub](https://hub.docker.com/)
+
 ## Installation
+
+Installation requires several steps:
+* install kubeflow following the following [blog posts](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-introduction)
+* Install kafka as described [here](kafka/README.md)
+* Populate minio with [test data](data) following [this post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-support-components-kubeflow)
+* Start Jupiter, following this [blog post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-jupyterhub-with-kubeflow) and
+test the [notebook](recommender/Recommender_Kubeflow.ipynb)
+* Try usage of TFJob for machine learning, following this [blog post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-kubeflow-tensorflow-jobs)
+Ksonnet definitions for these can be found [here](ks_app/README.md)
+* Deploy model serving components recommender and recommender1 following [this blog posts](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-kubeflow-model-serving) 
+Ksonnet definitions for these can be found [here](ks_app/README.md)
+* Deploy model server and request provider using this [chart](recommenderchart)
+* Run the complete implementation end-to-end using pipelines
 
 ## License
 
