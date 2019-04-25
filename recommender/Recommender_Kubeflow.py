@@ -21,13 +21,13 @@ from minio import Minio
 from keras.models import Model
 from keras.layers import *
 from keras.losses import *
-from keras import backend as K
 import tensorflow as tf
+from keras import backend as K
 import os
 
 # Read data
 
-minio_endpoint = os.environ.get('MINIO_URL', 'minio-service:9000')
+minio_endpoint = os.environ.get('MINIO_URL', 'minio-service-kubeflow.lightshift.lightbend.com')
 minio_key = os.environ.get('MINIO_KEY', 'minio')
 minio_secret = os.environ.get('MINIO_SECRET', 'minio123')
 
