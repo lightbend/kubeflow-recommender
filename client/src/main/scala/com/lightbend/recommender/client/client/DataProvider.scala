@@ -27,6 +27,7 @@ import com.lightbend.recommender.client.{KafkaLocalServer, MessageSender}
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.duration.Duration
 import scala.util.Random
 
 /**
@@ -38,7 +39,7 @@ object DataProvider {
 
   val generator = Random
   var modelTimeInterval = 1000 * 60 * 1 // 1 mins
-  var dataTimeInterval = 1000 * 1 // 1 sec
+  var dataTimeInterval = Duration(DATAPUBLISHINTERVAL)
   val df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
 
 
@@ -79,7 +80,7 @@ object DataProvider {
       nrec = nrec + 1
       if (nrec % 10 == 0)
         println(s"wrote $nrec records")
-      pause(dataTimeInterval)
+      pause(dataTimeInterval.toMillis)
     }
   }
 

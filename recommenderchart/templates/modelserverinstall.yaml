@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubeflow-model-server
+  labels:
+    app: kubeflow-model-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubeflow-model-server
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: kubeflow-model-server
+    spec:
+      containers:
+      - name: kubeflow-model-server
+        image: {{ .Values.image.modelserver }}:{{.Values.image.version }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.configuration.serving.port}}
+        env:
+          - name: KAFKA_BROKERS
+            value: "{{ .Values.configuration.kafka.brokerlist}}"
+          - name: MINIO_URL
+            value: "{{ .Values.configuration.minio.miniourl}}"
+          - name: MINIO_KEY
+            value: "{{ .Values.configuration.minio.miniokey}}"
+          - name: MINIO_SECRET
+            value: "{{ .Values.configuration.minio.miniosecret}}"
+          - name: DEFAULT_RECOMMENDER_URL
+            value: "{{ .Values.configuration.recommender.defaulturl}}"
+          - name: ALTERNATIVE_RECOMMENDER_URL
+            value: "{{ .Values.configuration.recommender.alternativeurl}}"
+          - name: SERVING_PORT
+            value: "{{ .Values.configuration.serving.port}}"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubeflow-model-server
+spec:
+  selector:
+    app: kubeflow-model-server
+  ports:
+  - protocol: TCP
+    port: {{ .Values.configuration.serving.port}}
+    targetPort: {{ .Values.configuration.serving.port}}
+

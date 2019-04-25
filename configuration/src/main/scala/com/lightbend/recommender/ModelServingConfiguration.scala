@@ -34,6 +34,7 @@ object ModelServingConfiguration {
   val MODELS_GROUP = config.getString("kafka.modelgroup")
 
   val MODELSERVING_PORT = config.getString("serving.port").toInt
+  val DATAPUBLISHINTERVAL = config.getString("loader.publishinterval")
 
   val MINIO_URL = config.getString("minio.miniourl")
   val MINIO_KEY = config.getString("minio.miniokey")

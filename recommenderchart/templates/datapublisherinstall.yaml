@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubeflow-recommendation-requester
+  labels:
+    app: kubeflow-recommendation-requester
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubeflow-recommendation-requester
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: kubeflow-recommendation-requester
+    spec:
+      containers:
+      - name: kubeflow-recommendation-requester
+        image: {{ .Values.image.client}}:{{.Values.image.version }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          - name: KAFKA_BROKERS
+            value: "{{ .Values.configuration.kafka.brokerlist}}"
+          - name: PUBLISHER_DATA_INTERVAL
+            value: {{ .Values.configuration.publisher.data_publish_interval}}
+

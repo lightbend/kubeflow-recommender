@@ -1,0 +1,21 @@
+# docker images
+image:
+  modelserver: lightbend/kubeflow-modelserver
+  client: lightbend/kubeflow-recommender-data
+  pullPolicy: Always
+  version: 0.0.1
+# Configuration parameters for an application
+configuration:
+  kafka:
+    brokerlist : "strimzi-kafka-brokers:9092"
+  minio:
+    miniourl: "http://minio-service-kubeflow.lightshift.lightbend.com/"
+    miniokey: "minio"
+    miniosecret: "minio123"
+  recommender:
+    defaulturl: "http://recommender-service:8500"
+    alternativeurl: "http://recommender1-service:8500"
+  publisher :
+    data_publish_interval : "1 second"
+  serving :
+    port : 5500

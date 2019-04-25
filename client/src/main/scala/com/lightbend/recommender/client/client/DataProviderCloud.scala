@@ -21,6 +21,7 @@ import com.lightbend.recommender.ModelServingConfiguration
 import com.lightbend.recommender.client.MessageSender
 
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Random
@@ -33,8 +34,7 @@ object DataProviderCloud {
   import ModelServingConfiguration._
 
   val generator = Random
-  var modelTimeInterval = 1000 * 60 * 1 // 1 mins
-  var dataTimeInterval = 1000 * 1 // 1 sec
+  val dataTimeInterval = Duration(DATAPUBLISHINTERVAL)
 
 
   def main(args: Array[String]) {
@@ -66,7 +66,7 @@ object DataProviderCloud {
       nrec = nrec + 1
       if (nrec % 10 == 0)
         println(s"wrote $nrec records")
-      pause(dataTimeInterval)
+      pause(dataTimeInterval.toMillis)
     }
   }
 

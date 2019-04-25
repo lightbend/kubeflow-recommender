@@ -1,0 +1,7 @@
+apiVersion: v1
+appVersion: 0.0.1
+description: Kubeflow Recommender
+maintainers:
+- name: Boris Lublinsky
+name: Kubeflow Recommender model server and data provider
+version: 1.0.0

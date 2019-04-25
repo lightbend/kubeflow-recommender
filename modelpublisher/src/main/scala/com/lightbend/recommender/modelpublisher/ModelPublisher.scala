@@ -40,7 +40,7 @@ object ModelPublisher {
       try {Thread.sleep(tmouot)} catch {
         case _: Throwable => // Ignore
       }
-      val response: HttpResponse[String] = Http(url + "/v1/models/recommender/versions/1").asString
+      val response: HttpResponse[String] = Http(s"$url/v1/models/$directory/versions/1").asString
       resp = response.code
       attempts = attempts + 1
       tmouot = tmouot * 2
@@ -52,7 +52,7 @@ object ModelPublisher {
       val bos = new ByteArrayOutputStream()
       val cdate = df.format(new Date())
       val model = new ModelDescriptor(s"Recommender $cdate", s"generated at $cdate",
-        url + "/v1/models/recommender/versions/1:predict")
+        s"$url/v1/models/$directory/versions/1:predict")
       model.writeTo(bos)
       sender.writeValue(MODELS_TOPIC, bos.toByteArray)
 
