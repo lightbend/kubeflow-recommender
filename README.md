@@ -15,8 +15,14 @@ there is a [bash file](recommender/build.sh).
 * Model serving is based on [TF-serving](https://www.kubeflow.org/docs/components/tfserving_new/). Due to limitations of [TF-serving](https://www.tensorflow.org/tfx/serving/serving_config#configuring_one_model)
 I have decided to run two instances of TF-serving and alterate their usage for serving.
 * KubeFlow Pipeline used to coordinate execution of steps. Notebook for creation and execution of pipeline is [here](pipelines/Pipelines.ipynb). Python code
-for pipeline creation is [here](pipelines/Pipelines.py). In pipeline UI, the pipeline looks as follows:
+for pipeline creation is [here](pipelines/Pipelines.py). Once the Python code runs, it creates a file, called `pipeline.tar.gz`. Following this
+[example](https://github.com/kubeflow/examples/tree/master/pipelines/mnist-pipelines), the definition can be uploaded to the pipelines UI. Now we can view the pipeline there
+![Pipelines](images/static_recommender.png). In addition we can also run pipeline from there, that produces
+the following result:
 ![Pipelines](images/Pipeline.png)
+Currectly pipelines do not allow to define periodic definition in the pipeline definition, but from UI, it is possible 
+to configure run as recurring and specify how often the run is executed
+![Pipelines](images/periodic.png) 
 
 Additional components included in this implementation include the following:
 * [Data Publister](datapublisher) is a project used for preparing new data for
