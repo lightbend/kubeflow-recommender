@@ -72,7 +72,9 @@ Ksonnet definitions for these can be found [here](ks_app/README.md)
 * Deploy model server and request provider using this [chart](recommenderchart)
 * Enable usage of Argo following [blog post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-support-components-kubeflow)
 * Enable usage of Kubeflow pipelines following [blog post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-deploying-kubeflow-pipelines)
-* Run the complete implementation end-to-end using pipelines
+* Test pipeline from the [notebook](pipelines/Pipelines.ipynb)
+* Build pipeline definition using [Python code](pipelines/Pipelines.py) and upload it to the pipeline UI
+* Start recurring pipeline execution.
 
 ## License
 
