@@ -9,7 +9,7 @@ configuration:
   kafka:
     brokerlist : "strimzi-kafka-brokers:9092"
   minio:
-    miniourl: "http://minio-service-kubeflow.lightshift.lightbend.com/"
+    miniourl: "http://minio-service:9000/"
     miniokey: "minio"
     miniosecret: "minio123"
   recommender:

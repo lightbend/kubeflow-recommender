@@ -14,6 +14,9 @@ THe actual notebook can be found [here](recommender/Recommender_Kubeflow.ipynb)
 there is a [bash file](recommender/build.sh).
 * Model serving is based on [TF-serving](https://www.kubeflow.org/docs/components/tfserving_new/). Due to limitations of [TF-serving](https://www.tensorflow.org/tfx/serving/serving_config#configuring_one_model)
 I have decided to run two instances of TF-serving and alterate their usage for serving.
+* KubeFlow Pipeline used to coordinate execution of steps. Notebook for creation and execution of pipeline is [here](pipelines/Pipelines.ipynb). Python code
+for pipeline creation is [here](pipelines/Pipelines.py). In pipeline UI, the pipeline looks as follows:
+![Pipelines](images/Pipeline.png)
 
 Additional components included in this implementation include the following:
 * [Data Publister](datapublisher) is a project used for preparing new data for
@@ -61,6 +64,8 @@ Ksonnet definitions for these can be found [here](ks_app/README.md)
 * Deploy model serving components recommender and recommender1 following [this blog posts](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-kubeflow-model-serving) 
 Ksonnet definitions for these can be found [here](ks_app/README.md)
 * Deploy model server and request provider using this [chart](recommenderchart)
+* Enable usage of Argo following [blog post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-support-components-kubeflow)
+* Enable usage of Kubeflow pipelines following [blog post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-deploying-kubeflow-pipelines)
 * Run the complete implementation end-to-end using pipelines
 
 ## License
