@@ -1,6 +1,6 @@
 package com.lightbend.recommender.actor
 
-import akka.{Done, japi}
+import akka.Done
 import akka.actor.ActorSystem
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}

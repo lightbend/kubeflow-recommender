@@ -69,6 +69,8 @@ test the [notebook](recommender/Recommender_Kubeflow.ipynb)
 Ksonnet definitions for these can be found [here](ks_app/README.md)
 * Deploy model serving components recommender and recommender1 following [this blog posts](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-kubeflow-model-serving) 
 Ksonnet definitions for these can be found [here](ks_app/README.md)
+* Deploy Strimzi following this [documentation](https://developer.lightbend.com/guides/openshift-deployment/lagom/deploying-kafka.html#installing-strimzi). Choose Strimzi version that you need.
+After the operator is installed, use this [yaml file](kafka/kafka.yaml) to create Kafka cluster 
 * Deploy model server and request provider using this [chart](recommenderchart)
 * Enable usage of Argo following [blog post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-support-components-kubeflow)
 * Enable usage of Kubeflow pipelines following [blog post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-deploying-kubeflow-pipelines)
