@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: kubeflow-data-publisher
+  name: kubeflow-data-publisher
+spec:
+  containers:
+    - env:
+        - name: MINIO_URL
+          value: "http://minio-service.kubeflow.svc.cluster.local:9000"
+        - name: MINIO_KEY
+          valueFrom:
+            secretKeyRef:
+              key: AWS_ACCESS_KEY_ID
+              name: minioaccess
+        - name: MINIO_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: AWS_SECRET_ACCESS_KEY
+              name: minioaccess
+      image: "lightbend/kubeflow-datapublisher:0.0.1"
+      imagePullPolicy: Always
+      name: modelpublisher
+  volumes:
+    - name: secret-volume
+      secret:
+        secretName: minioaccess

@@ -39,7 +39,7 @@ object Versions {
 
   val silencerVersion       = "1.3.1"
   
-  val minioVersion          = "6.0.6"
+  val minioVersion          = "6.0.9"
   
   val ScalajHTTPVersion     = "2.4.1"
 

@@ -1,0 +1,143 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: recommender-model-update-
+spec:
+  arguments:
+    parameters: []
+  entrypoint: recommender-model-update
+  serviceAccountName: pipeline-runner
+  templates:
+  - container:
+      env:
+      - name: MINIO_URL
+        value: http://minio-service:9000/
+      - name: MINIO_KEY
+        value: minio
+      - name: MINIO_SECRET
+        value: minio123
+      - name: KAFKA_BROKERS
+        value: strimzi-kafka-brokers:9092
+      - name: DEFAULT_RECOMMENDER_URL
+        value: http://recommender-service:8500
+      - name: ALTERNATIVE_RECOMMENDER_URL
+        value: http://recommender1-service:8500
+      image: lightbend/kubeflow-modelpublisher:0.0.1
+    name: publishmodel
+    outputs:
+      artifacts:
+      - name: mlpipeline-ui-metadata
+        path: /mlpipeline-ui-metadata.json
+        s3:
+          accessKeySecret:
+            key: accesskey
+            name: mlpipeline-minio-artifact
+          bucket: mlpipeline
+          endpoint: minio-service.kubeflow:9000
+          insecure: true
+          key: runs/{{workflow.uid}}/{{pod.name}}/mlpipeline-ui-metadata.tgz
+          secretKeySecret:
+            key: secretkey
+            name: mlpipeline-minio-artifact
+      - name: mlpipeline-metrics
+        path: /mlpipeline-metrics.json
+        s3:
+          accessKeySecret:
+            key: accesskey
+            name: mlpipeline-minio-artifact
+          bucket: mlpipeline
+          endpoint: minio-service.kubeflow:9000
+          insecure: true
+          key: runs/{{workflow.uid}}/{{pod.name}}/mlpipeline-metrics.tgz
+          secretKeySecret:
+            key: secretkey
+            name: mlpipeline-minio-artifact
+  - dag:
+      tasks:
+      - dependencies:
+        - trainmodel
+        name: publishmodel
+        template: publishmodel
+      - dependencies:
+        - updatedata
+        name: trainmodel
+        template: trainmodel
+      - name: updatedata
+        template: updatedata
+    name: recommender-model-update
+  - container:
+      env:
+      - name: MINIO_URL
+        value: minio-service:9000
+      - name: MINIO_KEY
+        value: minio
+      - name: MINIO_SECRET
+        value: minio123
+      image: lightbend/ml-tf-recommender:0.0.1
+    name: trainmodel
+    outputs:
+      artifacts:
+      - name: mlpipeline-ui-metadata
+        path: /mlpipeline-ui-metadata.json
+        s3:
+          accessKeySecret:
+            key: accesskey
+            name: mlpipeline-minio-artifact
+          bucket: mlpipeline
+          endpoint: minio-service.kubeflow:9000
+          insecure: true
+          key: runs/{{workflow.uid}}/{{pod.name}}/mlpipeline-ui-metadata.tgz
+          secretKeySecret:
+            key: secretkey
+            name: mlpipeline-minio-artifact
+      - name: mlpipeline-metrics
+        path: /mlpipeline-metrics.json
+        s3:
+          accessKeySecret:
+            key: accesskey
+            name: mlpipeline-minio-artifact
+          bucket: mlpipeline
+          endpoint: minio-service.kubeflow:9000
+          insecure: true
+          key: runs/{{workflow.uid}}/{{pod.name}}/mlpipeline-metrics.tgz
+          secretKeySecret:
+            key: secretkey
+            name: mlpipeline-minio-artifact
+  - container:
+      env:
+      - name: MINIO_URL
+        value: http://minio-service:9000/
+      - name: MINIO_KEY
+        value: minio
+      - name: MINIO_SECRET
+        value: minio123
+      image: lightbend/kubeflow-datapublisher:0.0.1
+    name: updatedata
+    outputs:
+      artifacts:
+      - name: mlpipeline-ui-metadata
+        path: /mlpipeline-ui-metadata.json
+        s3:
+          accessKeySecret:
+            key: accesskey
+            name: mlpipeline-minio-artifact
+          bucket: mlpipeline
+          endpoint: minio-service.kubeflow:9000
+          insecure: true
+          key: runs/{{workflow.uid}}/{{pod.name}}/mlpipeline-ui-metadata.tgz
+          secretKeySecret:
+            key: secretkey
+            name: mlpipeline-minio-artifact
+      - name: mlpipeline-metrics
+        path: /mlpipeline-metrics.json
+        s3:
+          accessKeySecret:
+            key: accesskey
+            name: mlpipeline-minio-artifact
+          bucket: mlpipeline
+          endpoint: minio-service.kubeflow:9000
+          insecure: true
+          key: runs/{{workflow.uid}}/{{pod.name}}/mlpipeline-metrics.tgz
+          secretKeySecret:
+            key: secretkey
+            name: mlpipeline-minio-artifact

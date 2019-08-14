@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: kubeflow-model-publisher
+  name: kubeflow-model-publisher
+spec:
+  containers:
+    - env:
+        - name: KAFKA_BROKERS
+          value: "strimzi-kafka-brokers.boris.svc.cluster.local:9092"
+        - name: MINIO_URL
+          value: "http://minio-service.kubeflow.svc.cluster.local:9000"
+        - name: MINIO_KEY
+          valueFrom:
+            secretKeyRef:
+              key: AWS_ACCESS_KEY_ID
+              name: minioaccess
+        - name: MINIO_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: AWS_SECRET_ACCESS_KEY
+              name: minioaccess
+        - name: DEFAULT_RECOMMENDER_URL
+          value: "http://recommender.boris.svc.cluster.local:8501"
+        - name: ALTERNATIVE_RECOMMENDER_URL
+          value: "http://recommender1.boris.svc.cluster.local:8501"
+      image: "lightbend/kubeflow-modelpublisher:0.0.1"
+      imagePullPolicy: Always
+      name: modelpublisher
+  volumes:
+    - name: secret-volume
+      secret:
+        secretName: minioaccess

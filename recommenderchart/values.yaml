@@ -7,14 +7,14 @@ image:
 # Configuration parameters for an application
 configuration:
   kafka:
-    brokerlist : "strimzi-kafka-brokers:9092"
+    brokerlist : "strimzi-kafka-brokers.boris.svc.cluster.local:9092"
   minio:
-    miniourl: "http://minio-service:9000/"
+    miniourl: "http://minio-service.kubeflow.svc.cluster.local:9000/"
     miniokey: "minio"
     miniosecret: "minio123"
   recommender:
-    defaulturl: "http://recommender-service:8500"
-    alternativeurl: "http://recommender1-service:8500"
+    defaulturl: "http://recommender.boris.svc.cluster.local:8501"
+    alternativeurl: "http://recommender1.boris.svc.cluster.local:8501"
   publisher :
     data_publish_interval : "1 second"
   serving :

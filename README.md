@@ -60,7 +60,7 @@ I was using [Docker Hub](https://hub.docker.com/)
 ## Installation
 
 Installation requires several steps:
-* install kubeflow following the following [blog posts](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-introduction)
+* install kubeflow following the [blog posts](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-introduction)
 * Install kafka as described [here](kafka/README.md)
 * Populate minio with [test data](data) following [this post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-support-components-kubeflow)
 * Start Jupiter, following this [blog post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-jupyterhub-with-kubeflow) and
@@ -69,7 +69,7 @@ test the [notebook](recommender/Recommender_Kubeflow.ipynb)
 Ksonnet definitions for these can be found [here](ks_app/README.md)
 * Deploy model serving components recommender and recommender1 following [this blog posts](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-kubeflow-model-serving) 
 Ksonnet definitions for these can be found [here](ks_app/README.md)
-* Deploy Strimzi following this [documentation](https://developer.lightbend.com/guides/openshift-deployment/lagom/deploying-kafka.html#installing-strimzi). Choose Strimzi version that you need.
+* Deploy Strimzi following this [documentation](https://developer.lightbend.com/docs/fast-data-platform/current-OpenShift/#strimzi-operator-kafka). 
 After the operator is installed, use this [yaml file](kafka/kafka.yaml) to create Kafka cluster 
 * Deploy model server and request provider using this [chart](recommenderchart)
 * Enable usage of Argo following [blog post](https://www.lightbend.com/blog/how-to-deploy-kubeflow-on-lightbend-platform-openshift-support-components-kubeflow)
@@ -77,6 +77,199 @@ After the operator is installed, use this [yaml file](kafka/kafka.yaml) to creat
 * Test pipeline from the [notebook](pipelines/Pipelines.ipynb)
 * Build pipeline definition using [Python code](pipelines/Pipelines.py) and upload it to the pipeline UI
 * Start recurring pipeline execution.
+
+## Installation update for version 0.6
+
+* install kubeflow following the following [documentation](https://www.kubeflow.org/docs/started/k8s/kfctl-k8s-istio/). To run successfully on OpenShift (4.1)
+set the following service account to scc anyuid:
+system:serviceaccount:kubeflow:admission-webhook-service-account,
+system:serviceaccount:kubeflow:default,
+system:serviceaccount:kubeflow:katib-controller,
+system:serviceaccount:kubeflow:katib-ui,
+system:serviceaccount:kubeflow:ml-pipeline,
+system:serviceaccount:kubeflow:argo-ui,
+system:serviceaccount:istio-system:prometheus,
+system:serviceaccount:istio-system:istio-citadel-service-account,
+system:serviceaccount:istio-system:istio-galley-service-account,
+system:serviceaccount:istio-system:istio-mixer-service-account,
+system:serviceaccount:istio-system:istio-pilot-service-account,
+system:serviceaccount:istio-system:istio-egressgateway-service-account,
+system:serviceaccount:istio-system:istio-ingressgateway-service-account,
+system:serviceaccount:istio-system:istio-sidecar-injector-service-account
+* To make Kiali running, update Kiali cluster role as follows
+````
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kiali
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterroles/kiali
+  uid: cd0de883-b9ff-11e9-bd33-023708277e46
+  resourceVersion: '11149746'
+  creationTimestamp: '2019-08-08T17:13:11Z'
+  labels:
+    app: kiali
+    chart: kiali
+    heritage: Tiller
+    release: istio
+rules:
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - ''
+    resources:
+      - configmaps
+      - endpoints
+      - namespaces
+      - nodes
+      - pods
+      - services
+      - replicationcontrollers
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - extensions
+      - apps
+      - apps.openshift.io
+    resources:
+      - deployments
+      - deploymentconfigs
+      - statefulsets
+      - replicasets
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - project.openshift.io
+    resources:
+      - projects
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - batch
+    resources:
+      - cronjobs
+      - jobs
+  - verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - watch
+    apiGroups:
+      - config.istio.io
+    resources:
+      - apikeys
+      - authorizations
+      - checknothings
+      - circonuses
+      - deniers
+      - fluentds
+      - handlers
+      - kubernetesenvs
+      - kuberneteses
+      - listcheckers
+      - listentries
+      - logentries
+      - memquotas
+      - metrics
+      - opas
+      - prometheuses
+      - quotas
+      - quotaspecbindings
+      - quotaspecs
+      - rbacs
+      - reportnothings
+      - rules
+      - solarwindses
+      - stackdrivers
+      - statsds
+      - stdios
+  - verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - watch
+    apiGroups:
+      - networking.istio.io
+    resources:
+      - destinationrules
+      - gateways
+      - serviceentries
+      - virtualservices
+  - verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - watch
+    apiGroups:
+      - authentication.istio.io
+    resources:
+      - policies
+      - meshpolicies
+  - verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - watch
+    apiGroups:
+      - rbac.istio.io
+    resources:
+      - clusterrbacconfigs
+      - rbacconfigs
+      - serviceroles
+      - servicerolebindings
+  - verbs:
+      - get
+    apiGroups:
+      - monitoring.kiali.io
+    resources:
+      - monitoringdashboards
+````
+* Populate minio with [test data](data) following using the following commands:
+````
+mc mb minio/data
+mc mb minio/models
+mc cp /Users/boris/Projects/Recommender/data/users.csv minio/data/recommender/users.csv
+mc cp /Users/boris/Projects/Recommender/data/transactions.csv minio/data/recommender/transactions.csv
+mc cp /Users/boris/Projects/Recommender/data/directory.txt minio/data/recommender/directory.txt
+````
+* Starting Jupiter server. Had to do several things:
+    * Following [issue](https://github.com/kubeflow/kubeflow/issues/3086) update notebooks-controller-role to include notebooks/finalizers and os adm policy
+    * Following [issue](https://github.com/kubeflow/kubeflow/issues/3232) created service account and gave it anyuid role
+* Creating TFJob. Several things:
+    * Without ksonet, it is necessary to create a [yaml file](tfjob/tf_job_recommender.yaml) for TFJob. Note, that container name has to be tensorflow
+    * tf-job-operator has to be added to anyuid
+    * Add tfjobs/finalizers to tf-job-operator role
+    * TFJob UI is not integrated yet. Go to <Istio Ingress>/tfjobs/ui/
+    
+
+* According to [Kubeflow documentation](https://www.kubeflow.org/docs/components/serving/tfserving_new/), Tensorflow serving has not yet been converted to kustomize. So 
+we are using a [custom deployment](tfserving/chart) (modeled after deployment in Kubeflow 0.4).
+* Argo. Several things: 
+    * update argo and argo-ui role to add workflows/finalizers
+    * update workflow-controller-configmap to add - containerRuntimeExecutor: k8sapi
 
 ## License
 

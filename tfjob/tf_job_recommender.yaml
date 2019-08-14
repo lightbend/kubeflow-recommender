@@ -1,0 +1,28 @@
+apiVersion: "kubeflow.org/v1"
+kind: "TFJob"
+metadata:
+  name: "recommederjob"
+  namespace: boris
+spec:
+  cleanPodPolicy: None
+  tfReplicaSpecs:
+    Worker:
+      replicas: 1
+      restartPolicy: Never
+      template:
+        spec:
+          containers:
+            - name: tensorflow
+              image: lightbend/ml-tf-recommender:0.0.1
+              imagePullPolicy: "Always"
+              env:
+                - name: "MINIO_URL"
+                  value: "minio-service.kubeflow.svc.cluster.local:9000"
+                - name: "MINIO_KEY"
+                  valueFrom: { secretKeyRef: { name: "minioaccess", key: "AWS_ACCESS_KEY_ID" } }
+                - name: "MINIO_SECRET"
+                  valueFrom: { secretKeyRef: { name: "minioaccess", key: "AWS_SECRET_ACCESS_KEY" } }
+          volumes:
+            - name: secret-volume
+              secret:
+                secretName: minioaccess
