@@ -81,21 +81,46 @@ After the operator is installed, use this [yaml file](kafka/kafka.yaml) to creat
 ## Installation update for version 0.6
 
 * install kubeflow following the following [documentation](https://www.kubeflow.org/docs/started/k8s/kfctl-k8s-istio/). To run successfully on OpenShift (4.1)
-set the following service account to scc anyuid:
+set the following service account to scc (this is a superset) anyuid:
+````
 system:serviceaccount:kubeflow:admission-webhook-service-account,
 system:serviceaccount:kubeflow:default,
 system:serviceaccount:kubeflow:katib-controller,
 system:serviceaccount:kubeflow:katib-ui,
 system:serviceaccount:kubeflow:ml-pipeline,
-system:serviceaccount:kubeflow:argo-ui,
 system:serviceaccount:istio-system:prometheus,
+system:serviceaccount:kubeflow:argo-ui,
 system:serviceaccount:istio-system:istio-citadel-service-account,
 system:serviceaccount:istio-system:istio-galley-service-account,
 system:serviceaccount:istio-system:istio-mixer-service-account,
 system:serviceaccount:istio-system:istio-pilot-service-account,
 system:serviceaccount:istio-system:istio-egressgateway-service-account,
 system:serviceaccount:istio-system:istio-ingressgateway-service-account,
-system:serviceaccount:istio-system:istio-sidecar-injector-service-account
+system:serviceaccount:istio-system:istio-sidecar-injector-service-account,
+system:serviceaccount:istio-system:grafana,
+system:serviceaccount:istio-system:default,
+system:serviceaccount:kubeflow:jupyter,
+system:serviceaccount:kubeflow:jupyter-notebook,
+system:serviceaccount:kubeflow:jupyter-hub,
+system:serviceaccount:boris:default-editor,
+system:serviceaccount:kubeflow:tf-job-operator,
+system:serviceaccount:istio-system:kiali-service-account,
+system:serviceaccount:boris:strimzi-cluster-operator
+````
+set the following service account to scc (this is a superset) privileged:
+````
+system:serviceaccount:openshift-infra:build-controller,
+system:serviceaccount:kubeflow:admission-webhook-service-account,
+system:serviceaccount:kubeflow:default,
+system:serviceaccount:kubeflow:katib-controller,
+system:serviceaccount:kubeflow:katib-ui,
+system:serviceaccount:kubeflow:ml-pipeline,
+system:serviceaccount:istio-system:jaeger,
+system:serviceaccount:bookinfo:default,
+system:serviceaccount:kubeflow:jupyter-web-app-service-account,
+system:serviceaccount:kubeflow:argo,
+system:serviceaccount:kubeflow:pipeline-runner
+````
 * To make Kiali running, update Kiali cluster role as follows
 ````
 kind: ClusterRole
