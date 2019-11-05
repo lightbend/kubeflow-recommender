@@ -303,3 +303,88 @@ Copyright (C) 2019 Lightbend Inc. (https://www.lightbend.com).
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+## Installation update for version 0.7 on Openshift 4.1
+
+First install Istio following this [documentation](https://docs.openshift.com/container-platform/4.1/service_mesh/service_mesh_arch/understanding-ossm.html)
+Next, install KNative following this [documentation](https://docs.openshift.com/container-platform/4.1/serverless/understanding-serverless.html)
+Follow installation steps [here](https://www.kubeflow.org/docs/started/k8s/kfctl-k8s-istio/), setting up 
+for the [later deployment](https://www.kubeflow.org/docs/started/k8s/kfctl-k8s-istio/#alternatively-set-up-your-configuration-for-later-deployment).
+Go to kfctl_k8s_istio.0.7.0.yaml and comment out Istio and KNative installs. Also go to the generated [kustomize files](openshift/kustomize/istio/base/kf-istio-resources.yaml)
+and update the last definition of the file to:
+```` 
+apiVersion: rbac.istio.io/v1alpha1
+kind: RbacConfig
+metadata:
+  name: default
+spec:
+  mode: $(clusterRbacConfig)
+````
+FInally run the following commands:
+````
+oc adm policy add-scc-to-user anyuid -z admission-webhook-service-account -nkubeflow
+oc adm policy add-scc-to-user anyuid -z katib-controller -nkubeflow
+oc adm policy add-scc-to-user anyuid -z katib-ui -nkubeflow
+oc adm policy add-scc-to-user anyuid -z default -nkubeflow
+oc adm policy add-scc-to-user anyuid -z ml-pipeline -nkubeflow
+````
+Install Kubeflow using `kfctl` command.
+Make sure that in your Istio configuration contains kubeflow namespace in 
+`ServiceMeshMemberRoll`
+````
+apiVersion: maistra.io/v1
+kind: ServiceMeshMemberRoll
+metadata:
+  selfLink: /apis/maistra.io/v1/namespaces/istio-system/servicemeshmemberrolls/default
+  resourceVersion: '63163135'
+  name: default
+  uid: eedb5e27-da19-11e9-aa18-12a7ea357834
+  creationTimestamp: '2019-09-18T13:40:52Z'
+  generation: 2
+  namespace: istio-system
+  ownerReferences:
+    - apiVersion: maistra.io/v1
+      kind: ServiceMeshControlPlane
+      name: basic-install
+      uid: a2fde1b5-d9a1-11e9-aa18-12a7ea357834
+  finalizers:
+    - maistra.io/istio-operator
+spec:
+  members:
+    - knative-serving
+    - kfserving-system
+    - kubeflow
+status:
+  configuredMembers:
+    - knative-serving
+    - kubeflow
+  meshGeneration: 2
+  observedGeneration: 2
+````
+And a kubeflow-gateway is added to a `ServiceMeshControlPlane` 
+````
+apiVersion: maistra.io/v1
+kind: ServiceMeshControlPlane
+metadata:
+  creationTimestamp: '2019-09-17T23:19:45Z'
+  finalizers:
+    - maistra.io/istio-operator
+  generation: 2
+  name: basic-install
+  namespace: istio-system
+  resourceVersion: '63163077'
+  selfLink: >-
+    /apis/maistra.io/v1/namespaces/istio-system/servicemeshcontrolplanes/basic-install
+  uid: a2fde1b5-d9a1-11e9-aa18-12a7ea357834
+spec:
+  istio:
+    gateways:
+      istio-egressgateway:
+        autoscaleEnabled: false
+      istio-ingressgateway:
+        autoscaleEnabled: false
+      kubeflow-gateway:
+        autoscaleEnabled: false
+....
+````
+Once this is done you can use Istio Ingress to access Kubeflow.
