@@ -296,13 +296,6 @@ we are using a [custom deployment](tfserving/chart) (modeled after deployment in
     * update argo and argo-ui role to add workflows/finalizers
     * update workflow-controller-configmap to add - containerRuntimeExecutor: k8sapi
 
-## License
-
-Copyright (C) 2019 Lightbend Inc. (https://www.lightbend.com).
-
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
-
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 ## Installation update for version 0.7 on Openshift 4.1
 
@@ -327,6 +320,7 @@ oc adm policy add-scc-to-user anyuid -z katib-controller -nkubeflow
 oc adm policy add-scc-to-user anyuid -z katib-ui -nkubeflow
 oc adm policy add-scc-to-user anyuid -z default -nkubeflow
 oc adm policy add-scc-to-user anyuid -z ml-pipeline -nkubeflow
+oc adm policy add-scc-to-user anyuid -z pipeline-runner -nkubeflow
 ````
 Install Kubeflow using `kfctl` command.
 Make sure that in your Istio configuration contains kubeflow namespace in 
@@ -388,3 +382,11 @@ spec:
 ....
 ````
 Once this is done you can use Istio Ingress to access Kubeflow.
+
+## License
+
+Copyright (C) 2019 Lightbend Inc. (https://www.lightbend.com).
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
