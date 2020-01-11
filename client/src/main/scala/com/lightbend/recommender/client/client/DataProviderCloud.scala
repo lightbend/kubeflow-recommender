@@ -26,6 +26,7 @@ object DataProviderCloud {
 
     println("Recommender data provider")
     println(s"Using kafka brokers at $KAFKA_BROKER")
+    println(s"Using kafka topic $DATA_TOPIC")
     println(s"Data Message delay $dataTimeInterval")
 
     publishData()

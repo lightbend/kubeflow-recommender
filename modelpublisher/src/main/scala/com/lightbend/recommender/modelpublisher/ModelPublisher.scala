@@ -1,6 +1,6 @@
 package com.lightbend.recommender.modelpublisher
 
-import java.io.ByteArrayOutputStream
+import java.io.{ByteArrayOutputStream, InputStream}
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -11,6 +11,7 @@ import io.minio.MinioClient
 import scalaj.http._
 
 import scala.io.Source
+import scala.collection.JavaConverters._
 
 object ModelPublisher {
 
@@ -25,12 +26,20 @@ object ModelPublisher {
     val minioClient = new MinioClient(MINIO_URL, MINIO_KEY, MINIO_SECRET)
 
     // Get current directory
-    val stream = minioClient.getObject("data", "recommender/directory.txt")
-    val directory = Source.fromInputStream(stream).mkString
-    stream.close
+    var directory = ""
+    var stream : InputStream = null
+    try{
+      stream = minioClient.getObject("data", "recommender/directory.txt")
+      directory = Source.fromInputStream(stream).mkString
+      stream.close
+    } catch {case _: Throwable => }
 
     // Calculate URL
     val url = if(directory == default_directory) DEFAULT_URL else ALTERNATIVE_URL
+
+    // Get Model files
+    val models = getmodelFiles(minioClient, "models", s"$directory/1")
+    println(models)
 
     // Make sure we can access endpoint
     var resp = 300
@@ -59,5 +68,9 @@ object ModelPublisher {
       println(s"Published Model ${model.description}")
 
     }
+  }
+
+  private def getmodelFiles(client: MinioClient, bucket: String, prefix: String): Seq[String] = {
+    client.listObjects(bucket,prefix).asScala.map(_.get().objectName()).toSeq
   }
 }

@@ -383,6 +383,10 @@ spec:
 ````
 Once this is done you can use Istio Ingress to access Kubeflow.
 
+Notebook image
+````
+gcr.io/kubeflow-images-public/tensorflow-1.13.1-notebook-cpu:v-base-08f3cbc-1166369568336121856
+````
 ## License
 
 Copyright (C) 2019 Lightbend Inc. (https://www.lightbend.com).

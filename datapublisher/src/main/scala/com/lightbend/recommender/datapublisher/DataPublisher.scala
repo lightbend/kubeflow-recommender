@@ -8,6 +8,8 @@ import io.minio.MinioClient
 
 import scala.io.Source
 
+import scala.collection.JavaConverters._
+
 // This is a simplified version of data publisher.
 // Instead of reading current information from the database, this code is republishes the same data
 object DataPublisher {
@@ -49,7 +51,6 @@ object DataPublisher {
       stream.close
     } catch {case _: Throwable => }
 
-
     // calculate a new directory name
     directory = if(directory == default_directory) default_directory.concat("1") else default_directory
 
@@ -60,14 +61,13 @@ object DataPublisher {
 
     // Write directory name
     val bis = new ByteArrayInputStream(directory.getBytes("UTF-8"))
-    minioClient.putObject("data", "recommender/directory.txt", bis, "application/octet-stream")
+     minioClient.putObject("data", "recommender/directory.txt", bis, null, null, null, "application/octet-stream")
 
     // Remove any models in the directory
-    val models = minioClient.listObjects("models",directory)
-    models.forEach(model => {
-      val name = model.get().objectName()
-      println(s"removing model file ${model.get().objectName()}")
-      minioClient.removeObject("models", name)
+    val models = getmodelFiles("models",directory)
+    models.foreach(model => {
+      println(s"removing model file $model")
+      minioClient.removeObject("models", model)
     })
 
     // Read it back
@@ -76,4 +76,8 @@ object DataPublisher {
     stream.close
     println(result)
   }
+
+  private def getmodelFiles(client: MinioClient, bucket: String, prefix: String): Seq[String] = {
+    client.listObjects(bucket,prefix).asScala.map(_.get().objectName()).toSeq
+   }
 }

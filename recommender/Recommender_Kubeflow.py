@@ -18,7 +18,7 @@
 # In[1]:
 
 
-get_ipython().system('pip install --upgrade pip')
+get_ipython().system('pip3 install --upgrade pip')
 get_ipython().system('pip3 install pandas --upgrade')
 get_ipython().system('pip3 install keras --upgrade')
 get_ipython().system('pip3 install minio --upgrade')
@@ -46,7 +46,7 @@ from keras import backend as K
 # 1. We use Tensorflow build in support to write resulting model to Minio
 # 2. We use Minio APIs to read source data using Pandas. We could of use Boto APIs here instead.
 
-# In[5]:
+# In[3]:
 
 
 minio_endpoint = os.environ.get('MINIO_URL', 'minio-service.kubeflow.svc.cluster.local:9000')
@@ -64,7 +64,7 @@ os.environ['S3_USE_HTTPS'] = '0'
 os.environ['S3_VERIFY_SSL'] = '0'
 
 
-# In[6]:
+# In[4]:
 
 
 minioClient = Minio(minio_endpoint,
@@ -78,14 +78,14 @@ minioClient.fget_object('data', 'recommender/transactions.csv', '/tmp/transactio
 transactions = pd.read_csv('/tmp/transactions.csv')
 
 
-# In[7]:
+# In[5]:
 
 
 print(customers.shape)
 customers.head()
 
 
-# In[8]:
+# In[6]:
 
 
 print(transactions.shape)
@@ -97,7 +97,7 @@ transactions.head()
 # Our goal here is to break down each list of items in the products column into rows 
 # and count the number of products bought by a user
 
-# In[ ]:
+# In[7]:
 
 
 # 1: split product items
@@ -105,7 +105,7 @@ transactions['products'] = transactions['products'].apply(lambda x: [int(i) for 
 transactions.head(2).set_index('customerId')['products'].apply(pd.Series).reset_index()
 
 
-# In[ ]:
+# In[8]:
 
 
 # 2: organize a given table into a dataframe with customerId, single productId, and purchase count
@@ -122,7 +122,7 @@ pd.melt(transactions.head(2).set_index('customerId')['products'].apply(pd.Series
 
 # ## 3.1 Create data with user, item, and target field
 
-# In[ ]:
+# In[9]:
 
 
 data = pd.melt(transactions.set_index('customerId')['products'].apply(pd.Series).reset_index(), 
@@ -150,7 +150,7 @@ data.head()
 # 
 # 
 
-# In[ ]:
+# In[10]:
 
 
 def create_data_dummy(data):
@@ -162,14 +162,14 @@ data_dummy = create_data_dummy(data)
 
 # ## 3.3 Normalize item values across users
 
-# In[ ]:
+# In[11]:
 
 
 df_matrix = pd.pivot_table(data, values='purchase_count', index='customerId', columns='productId')
 df_matrix.head()
 
 
-# In[ ]:
+# In[12]:
 
 
 df_matrix_norm = (df_matrix-df_matrix.min())/(df_matrix.max()-df_matrix.min())
@@ -177,7 +177,7 @@ print(df_matrix_norm.shape)
 df_matrix_norm.head()
 
 
-# In[ ]:
+# In[13]:
 
 
 # create a table for input to the modeling
@@ -191,7 +191,7 @@ data_norm.head()
 
 # # 4 Preparing data for learning
 
-# In[ ]:
+# In[14]:
 
 
 customer_idxs = np.array(data_norm.customerId, dtype = np.int)
@@ -214,7 +214,7 @@ print(ratings)
 
 # ## 4.1 Tensorflow Session
 
-# In[ ]:
+# In[15]:
 
 
 # create TF session and set it in Keras
@@ -225,7 +225,7 @@ K.set_learning_phase(1)
 
 # ## 4.2 Model Class
 
-# In[ ]:
+# In[16]:
 
 
 class DeepCollaborativeFiltering(Model):
@@ -266,7 +266,7 @@ class DeepCollaborativeFiltering(Model):
 
 # ## 4.3 Hyperparameters
 
-# In[ ]:
+# In[17]:
 
 
 bs = 64
@@ -276,7 +276,7 @@ epochs = 3
 
 # ## 4.4 Model Definition
 
-# In[ ]:
+# In[18]:
 
 
 model = DeepCollaborativeFiltering(n_customers, n_products, n_factors)
@@ -285,25 +285,17 @@ model.summary()
 
 # # 5 Training
 
-# In[ ]:
+# In[19]:
 
 
 model.compile(optimizer = 'adam', loss = mean_squared_logarithmic_error)
 model.fit(x = [customer_idxs, product_idxs], y = ratings, batch_size = bs, epochs = epochs, validation_split = val_per)
 print('Done training!')
 
-print ("input 0", model.input[0].name)
-print ("input 1", model.input[1].name)
-print ("input ", model.input)
-
-print ("output 0", model.output[0].name)
-print ("output 1", model.output[1].name)
-print ("output", model.output)
-
 
 # # 6 Get current output directory for model
 
-# In[ ]:
+# In[20]:
 
 
 directorystream = minioClient.get_object('data', 'recommender/directory.txt')
@@ -317,19 +309,26 @@ print ('Exporting trained model to', export_path)
 
 # ## 6.1 Export models
 
-# In[ ]:
+# In[21]:
 
 
-tensor_info_ver = tf.saved_model.utils.build_tensor_info(tf.constant([arg_version]))
 # inputs/outputs
 tensor_info_users = tf.saved_model.utils.build_tensor_info(model.input[0])
 tensor_info_products = tf.saved_model.utils.build_tensor_info(model.input[1])
 tensor_info_pred = tf.saved_model.utils.build_tensor_info(model.output)
+
+print ("tensor_info_users", tensor_info_users.name)
+print ("tensor_info_products", tensor_info_products.name)
+print ("tensor_info_pred", tensor_info_pred.name)
+
+
+# In[22]:
+
+
 # signature
 prediction_signature = (tf.saved_model.signature_def_utils.build_signature_def(
-        inputs={'users': tensor_info_users, 'products': tensor_info_products},
-        outputs={'recommendations': tensor_info_pred,
-                 'model-version': tensor_info_ver},
+        inputs={"users": tensor_info_users, "products": tensor_info_products},
+        outputs={"predictions": tensor_info_pred},
         method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME))
 # export
 legacy_init_op = tf.group(tf.tables_initializer(), name='legacy_init_op')

@@ -1,20 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: recommender1
+  namespace: kubeflow
+  name: recommendermodelserver
   labels:
-    app: recommender1
+    app: recommendermodelserver
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: recommender1
+      app: recommendermodelserver
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: recommender1
+        app: recommendermodelserver
     spec:
       containers:
         - name: serving
@@ -47,7 +48,7 @@ spec:
             - name: "MODEL_BASE_PATH"
               value: "s3://models"
             - name: "MODEL_NAME"
-              value: "recommender1"
+              value: "recommender"
           volumes:
             - name: secret-volume
               secret:
@@ -56,10 +57,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: recommender1
+  namespace: kubeflow
+  name: recommendermodelserver
 spec:
   selector:
-    app: recommender1
+    app: recommendermodelserver
   ports:
   - protocol: TCP
     port: 8501
